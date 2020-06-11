@@ -1,12 +1,11 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 
 
 class Users(models.Model):
 
-    id = models.AutoField(primary_key = True)
-    email = models.EmailField(unique = True)
-    password = models.CharField(max_length = 50)
+    user = models.OneToOneField(User, on_delete = models.CASCADE)
     name = models.CharField(max_length = 40)
     address = models.TextField(max_length = 80)
     latitude = models.DecimalField(max_digits = 9, decimal_places = 6)
