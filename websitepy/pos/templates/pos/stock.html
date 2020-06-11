@@ -1,0 +1,61 @@
+{% load static %}
+
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Stock Management | Argon</title>
+    <script src="{% static "pos/libs/vue.js" %}"></script>
+    <link rel="stylesheet" href="{% static "pos/stock.css" %}">
+</head>
+
+<body>
+
+    <header>
+        <div class="container">
+            <nav>
+                <a href="billing">BILLING</a>
+                <a href="#">STOCK MANAGEMENT</a>
+                <a href="report">REPORT</a>
+            </nav>
+        </div>
+    </header>
+
+    <div id="app">
+
+        <section id="allstock">
+
+            <div id="search-container">
+                <input type="text" placeholder="search" id="search" v-model="searchtext">
+            </div>
+
+            <div id="table-holder">
+                <table>
+                    <tr>
+                        <th class="cell-id">ID</th>
+                        <th class="cell-name">NAME</th>
+                        <th class="cell-distributor">DISTRIBUTOR</th>
+                        <th class="cell-stock">STOCK</th>
+                    </tr>
+                    <tr is="product-row" v-for="product in products" v-if="product.visible" v-bind:key="product.id" v-bind:product="product"></tr>
+                </table>
+            </div>
+
+        </section>
+
+        <aside id="emptystock">
+
+        </aside>
+
+    </div>
+
+    <script src="{% static "pos/stock.js" %}"></script>
+    <script>
+        vm.products = {{ productlist|safe }};
+    </script>
+
+</body>
+
+</html>
