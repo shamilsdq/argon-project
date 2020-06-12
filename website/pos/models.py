@@ -1,11 +1,16 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
 
+# Django already has a User model for authentication.
+# We will be extending that model with our Users model having a OneToOneField.
+# Our model will store additional profile data.
 class Users(models.Model):
 
-    user = models.OneToOneField(User, on_delete = models.CASCADE)
+    user = models.ForeignKey(User, on_delete = models.CASCADE)
     name = models.CharField(max_length = 40)
     address = models.TextField(max_length = 80)
     latitude = models.DecimalField(max_digits = 9, decimal_places = 6)
@@ -14,7 +19,7 @@ class Users(models.Model):
 
     def __str__(self):
         return self.name
-    
+
 
 
 class Products(models.Model):
