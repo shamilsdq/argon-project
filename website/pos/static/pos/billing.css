@@ -49,6 +49,16 @@ nav a {
     color: #ffffff;
 }
 
+header .container > a {
+    display: inline-block;
+    float: right;
+    padding: 5px 10px;
+    margin-right: 10px;
+    font: 0.75rem 'Open Sans', sans-serif;
+    font-weight: 700;
+    color: #ffffff;
+}
+
 #app {
     display: block;
     width: 1250px;

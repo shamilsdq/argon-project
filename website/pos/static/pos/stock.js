@@ -19,6 +19,7 @@ Vue.component('product-row', {
 
 
 
+
 var vm = new Vue({
 
     el: '#app',
@@ -28,11 +29,11 @@ var vm = new Vue({
     data: {
 
         searchtext: '',
+        products: [],
 
-        products: [
-            { id: 1, name: 'Paracetamol', distributor: 'Inglecorp', stock: 123, visible: true },
-            { id: 2, name: 'Dolo', distributor: 'Megham labs', stock: 234, visible: true },
-        ],
+        newproductquery: '',
+        newproductsuggestions: '',
+        selectedsuggestion: null
 
     },
 

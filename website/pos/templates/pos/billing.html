@@ -1,79 +1,61 @@
+{% extends 'pos/authenticatedbase.html' %}
+
 {% load static %}
 
+{% block htmltitle %}Billing | Argon{% endblock %}
 
-<!DOCTYPE html>
-<html>
-
-<head>
-    <meta charset="utf-8">
-    <title>Billing | Argon</title>
+{% block htmlstatic %}
     <script src="{% static "pos/libs/vue.js" %}"></script>
     <link rel="stylesheet" href="{% static "pos/billing.css" %}">
-</head>
+{% endblock  %}
 
-<body>
+{% block htmlapp %}
+    <section id="form-holder">
+        <input type="text" id="search" placeholder="Product name" autocomplete="off" v-model="query" v-on:keyup.enter="searchQuery()" />
+        <ul id="suggestions-holder" v-if="suggestions.length > 0">
+            <suggestionrow v-for="suggestedproduct in suggestions" :key="suggestedproduct.id" :row-data="suggestedproduct"></suggestionrow>
+        </ul>
+    </section>
 
-    <header>
-        <div class="container">
-            <nav>
-                <a href="#">BILLING</a>
-                <a href="stock">STOCK MANAGEMENT</a>
-                <a href="report">REPORT</a>
-            </nav>
+    <section id="table-holder">
+        <table>
+            <tr>
+                <th class="product-id">ID</th>
+                <th class="product-name">NAME</th>
+                <th class="product-mrp">MRP</th>
+                <th class="product-price">PRICE</th>
+                <th class="product-qty">QTY</th>
+                <th class="product-amt">AMT</th>
+                <th class="product-delete"></th>
+            </tr>
+            <tr is="productrow" v-for="product in products" v-bind:key="product.id" v-bind:row-data="product"></tr>
+        </table>
+    </section>
+
+    <aside id="details-holder">
+
+        <h3>CUSTOMER DETAILS</h3>
+        <label for="customer-number">Mobile no.</label>
+        <input id="customer-number" type="tel" v-model="contact">
+
+        <h3>BILL DETAILS</h3>
+        <div class="bill-details" id="total">
+            <span>TOTAL</span>
+            <span><input type="number" v-model="total" disabled></span>
         </div>
-    </header>
+        <div class="bill-details">
+            <span>PAID</span>
+            <span><input type="number" v-model="paid"></span>
+        </div>
+        <div class="bill-details">
+            <span>BALANCE</span>
+            <span><input type="number" v-model="balance" disabled></span>
+        </div>
+        <button @click="completeBill">COMPLETE</button>
 
-    <div id="app">
+    </aside>
+{% endblock %}
 
-        <section id="form-holder">
-            <input type="text" id="search" placeholder="Product name" autocomplete="off" v-model="query" v-on:keyup.enter="searchQuery()" />
-            <ul id="suggestions-holder" v-if="suggestions.length > 0">
-                <suggestionrow v-for="suggestedproduct in suggestions" :key="suggestedproduct.id" :row-data="suggestedproduct"></suggestionrow>
-            </ul>
-        </section>
-
-        <section id="table-holder">
-            <table>
-                <tr>
-                    <th class="product-id">ID</th>
-                    <th class="product-name">NAME</th>
-                    <th class="product-mrp">MRP</th>
-                    <th class="product-price">PRICE</th>
-                    <th class="product-qty">QTY</th>
-                    <th class="product-amt">AMT</th>
-                    <th class="product-delete"></th>
-                </tr>
-                <tr is="productrow" v-for="product in products" v-bind:key="product.id" v-bind:row-data="product"></tr>
-            </table>
-        </section>
-
-        <aside id="details-holder">
-
-            <h3>CUSTOMER DETAILS</h3>
-            <label for="customer-number">Mobile no.</label>
-            <input id="customer-number" type="tel" v-model="contact">
-
-            <h3>BILL DETAILS</h3>
-            <div class="bill-details" id="total">
-                <span>TOTAL</span>
-                <span><input type="number" v-model="total" disabled></span>
-            </div>
-            <div class="bill-details">
-                <span>PAID</span>
-                <span><input type="number" v-model="paid"></span>
-            </div>
-            <div class="bill-details">
-                <span>BALANCE</span>
-                <span><input type="number" v-model="balance" disabled></span>
-            </div>
-            <button @click="completeBill">COMPLETE</button>
-
-        </aside>
-
-    </div>
-
+{% block htmljs %}
     <script src="{% static "pos/billing.js" %}"></script>
-
-</body>
-
-</html>
+{% endblock %}

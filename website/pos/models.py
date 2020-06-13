@@ -6,7 +6,7 @@ from django.dispatch import receiver
 
 
 # Django already has a User model for authentication.
-# We will be extending that model with our Users model having a OneToOneField.
+# We'll extend that User wodel with our Users model using a foreign key.
 # Our model will store additional profile data.
 class Users(models.Model):
 
@@ -50,7 +50,7 @@ class Distributors(models.Model):
 
 class Stocks(models.Model):
 
-    user = models.ForeignKey(Users, on_delete = models.CASCADE)
+    user = models.ForeignKey(User, on_delete = models.CASCADE)
     product = models.ForeignKey(Products, on_delete = models.CASCADE)
     distributor = models.ForeignKey(Distributors, on_delete = models.CASCADE)
     cost = models.FloatField()
@@ -65,7 +65,7 @@ class Stocks(models.Model):
 class Bills(models.Model):
 
     id = models.AutoField(primary_key = True)
-    user = models.ForeignKey(Users, on_delete = models.CASCADE)
+    user = models.ForeignKey(User, on_delete = models.CASCADE)
     time = models.DateTimeField(auto_now = True)
     customernumber = models.IntegerField()
     amount = models.FloatField()

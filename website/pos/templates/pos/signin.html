@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html>
 
@@ -5,8 +7,38 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign in | Argon</title>
+    <link rel="stylesheet" href="{% static "pos/signin.css" %}">
 </head>
 
-<body></body>
+<body>
+    <div id="app">
+
+        <form method="POST">
+        {% csrf_token %}
+
+        <h3>SIGN IN</h3>
+
+        {% for field in form %}
+            <p>
+                <span>{{ field.label_tag }}</span>
+                {{ field }}
+            </p>
+        {% endfor %}
+
+        {% for error in field.errors %}
+            <p style="color: red">{{ error }}</p>
+        {% endfor %}
+
+        <button type="submit">Sign in</button>
+        </form>
+
+        <aside>
+            <p>
+                If you are a new user, just <a href="signup">sign up</a>
+            </p>
+        </aside>
+
+    </div>
+</body>
 
 </html>

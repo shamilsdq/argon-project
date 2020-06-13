@@ -1,19 +1,28 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib import messages
 from django.contrib.auth.models import User
 from pos.models import Users
 from .models import Users, Products, Distributors, Stocks
 from pos.forms import SignUpForm
 
 
+
 def signup(request):
+
+    if request.user.is_authenticated:
+        return redirect(billing)
+
     if request.method == 'POST':
         form = SignUpForm(request.POST)
+
         if form.is_valid():
-
+            # Create an auth User.
             newuser = form.save()
-            newuser.refresh_from_db()  # load the profile instance created by the signal
+            newuser.refresh_from_db()
 
+            # Create a Users object with more details and link with auth User.
             name = form.cleaned_data.get('name')
             address = form.cleaned_data.get('address')
             latitude = form.cleaned_data.get('latitude')
@@ -21,8 +30,9 @@ def signup(request):
             entry = Users.objects.create(name = name, address = address, latitude = latitude, longitude = longitude, user_id = newuser.id)
             entry.save()
 
-            raw_password = form.cleaned_data.get('password1')
-            user = authenticate(username = newuser.username, password = raw_password)
+            # Using these details, login the new user and go to billing page.
+            password = form.cleaned_data.get('password1')
+            user = authenticate(username = newuser.username, password = password)
             login(request, user)
             return redirect(billing)
 
@@ -33,32 +43,74 @@ def signup(request):
     return render(request, 'pos/signup.html', context)
 
 
+
 def signin(request):
-    context = {}
+
+    if request.user.is_authenticated:
+        return redirect(billing)
+        
+    if request.method == 'POST':
+        form = AuthenticationForm(request = request, data = request.POST)
+
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username = username, password = password)
+            if user is not None:
+                login(request, user)
+                return redirect(billing)
+        
+        messages.error(request, 'Invalid credentials')
+    
+    else:
+        form = AuthenticationForm()
+    
+    context = {'form': form}
     return render(request, 'pos/signin.html', context)
 
 
+
 def signout(request):
-    logout(request)
+
+    if request.user.is_authenticated:
+        logout(request)
+
     return redirect(signin)
 
 
+
 def billing(request):
-    context = {}
-    return render(request, 'pos/billing.html', context)
+
+    if request.user.is_authenticated:
+        context = {}
+        return render(request, 'pos/billing.html', context)
+
+    else:
+        return redirect(signin)
+
 
 
 def stock(request):
-    dbresult = Stocks.objects.filter(user__id=1).order_by('product_id')
-    productlist = []
-    for row in dbresult:
-        ## passing a non-empty string to visible property will give true in js
-        details = {'id': row.product_id, 'name': row.product.name, 'distributor': row.distributor.name, 'stock': row.stock, 'visible': '1'}
-        productlist.append(details)
-    context = {'productlist': productlist}
-    return render(request, 'pos/stock.html', context)
+
+    if request.user.is_authenticated:
+        dbresult = Stocks.objects.filter(user__id=1).order_by('product_id')
+        productlist = []
+
+        for row in dbresult:
+            ## passing a non-empty string to visible property will give true in js
+            details = {'id': row.product_id, 'name': row.product.name, 'distributor': row.distributor.name, 'stock': row.stock, 'visible': '1'}
+            productlist.append(details)
+
+        context = {'productlist': productlist}
+        return render(request, 'pos/stock.html', context)
+
+    else:
+        return redirect(signin)
+
 
 
 def report(request):
+
+    Products.objects.create(company="inglecorp", name="Sulphuric acid", genericname="hydrogen sulphide", mrp=80, tax=8)
     context = {}
     return render(request, 'pos/report.html', context)

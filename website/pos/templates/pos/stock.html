@@ -1,61 +1,52 @@
+{% extends 'pos/authenticatedbase.html' %}
+
 {% load static %}
 
+{% block htmltitle %}Stock | Argon{% endblock %}
 
-<!DOCTYPE html>
-<html>
-
-<head>
-    <meta charset="utf-8">
-    <title>Stock Management | Argon</title>
+{% block htmlstatic %}
     <script src="{% static "pos/libs/vue.js" %}"></script>
     <link rel="stylesheet" href="{% static "pos/stock.css" %}">
-</head>
+{% endblock %}
 
-<body>
+{% block htmlapp %}
+    <section id="allstock">
 
-    <header>
-        <div class="container">
-            <nav>
-                <a href="billing">BILLING</a>
-                <a href="#">STOCK MANAGEMENT</a>
-                <a href="report">REPORT</a>
-            </nav>
+        <div id="search-container">
+            <input type="text" placeholder="search" id="search" v-model="searchtext">
         </div>
-    </header>
 
-    <div id="app">
+        <div id="table-holder">
+            <table>
+                <tr>
+                    <th class="cell-id">ID</th>
+                    <th class="cell-name">NAME</th>
+                    <th class="cell-distributor">DISTRIBUTOR</th>
+                    <th class="cell-stock">STOCK</th>
+                </tr>
+                <tr is="product-row" v-for="product in products" v-if="product.visible" v-bind:key="product.id" v-bind:product="product"></tr>
+            </table>
+        </div>
 
-        <section id="allstock">
+    </section>
 
-            <div id="search-container">
-                <input type="text" placeholder="search" id="search" v-model="searchtext">
-            </div>
+    <aside id="newproduct">
+        <h3>New Product</h3>
+        <p>
+            <input type="text" v-model="newproductquery"><button>Search</button>
+            <ul v-if="newproductsuggestions.length > 0">
+                <% newproductsuggestions %>
+            </ul>
+        </p>
+        <p id="selectiondata" v-if="selectedsuggestion != null">
+            <% selectedsuggestion.id %>
+        </p>
+    </aside>
+{% endblock %}
 
-            <div id="table-holder">
-                <table>
-                    <tr>
-                        <th class="cell-id">ID</th>
-                        <th class="cell-name">NAME</th>
-                        <th class="cell-distributor">DISTRIBUTOR</th>
-                        <th class="cell-stock">STOCK</th>
-                    </tr>
-                    <tr is="product-row" v-for="product in products" v-if="product.visible" v-bind:key="product.id" v-bind:product="product"></tr>
-                </table>
-            </div>
-
-        </section>
-
-        <aside id="emptystock">
-
-        </aside>
-
-    </div>
-
+{% block htmljs %}
     <script src="{% static "pos/stock.js" %}"></script>
     <script>
         vm.products = {{ productlist|safe }};
     </script>
-
-</body>
-
-</html>
+{% endblock %}

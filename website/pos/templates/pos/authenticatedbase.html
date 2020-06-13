@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {% block htmltitle %} {% endblock %}
+    </title>
+
+    {% block htmlstatic %} {% endblock %}
+
+</head>
+
+<body>
+    
+    <header>
+        <div class="container">
+            <nav>
+                <a href="billing">BILLING</a>
+                <a href="stock">STOCK MANAGEMENT</a>
+                <a href="report">REPORT</a>
+            </nav>
+            <a href="logout">LOGOUT</a>
+            <a href="profile">USER</a>
+        </div>
+    </header>
+
+    <div id="app">
+        {% block htmlapp %} {% endblock %}
+    </div>
+
+    {% block htmljs %} {% endblock %}
+
+</body>
+
+</html>
