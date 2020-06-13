@@ -156,3 +156,8 @@ td.cell-stock {
     text-align: center;
     border-bottom: 1px solid #08ac7e;
 }
+
+#newproduct p {
+    display: block;
+    padding: 0.5rem;
+}

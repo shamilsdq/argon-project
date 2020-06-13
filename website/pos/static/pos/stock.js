@@ -32,9 +32,32 @@ var vm = new Vue({
         products: [],
 
         newproductquery: '',
-        newproductsuggestions: '',
+        newproductsuggestions: [],
         selectedsuggestion: null
 
+    },
+
+    methods: {
+        queryproduct: function() {
+            if (this.newproductquery.length < 4) {
+                this.newproductsuggestions = [];
+                return;
+            }
+
+            url = '#';
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) throw 'Error';
+                    return response.json();
+                })
+                .then(data => {
+                    this.newproductsuggestions = [];
+                    for (i = 0; i < data.products.length; i++) this.newproductsuggestions.push(data.products[i]);
+                })
+                .catch(error => {
+                    console.log('error: ', error);
+                })
+        },
     },
 
     watch: {

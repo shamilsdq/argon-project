@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.http import JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
@@ -8,6 +9,9 @@ from .models import Users, Products, Distributors, Stocks
 from pos.forms import SignUpForm
 
 
+# ------------
+# normal views
+# ------------
 
 def signup(request):
 
@@ -114,3 +118,35 @@ def report(request):
     Products.objects.create(company="inglecorp", name="Sulphuric acid", genericname="hydrogen sulphide", mrp=80, tax=8)
     context = {}
     return render(request, 'pos/report.html', context)
+
+
+
+def profile(request):
+    pass
+
+
+
+# --------------
+# json responses
+# --------------
+
+def querynewproducts(request):
+
+    if request.user.is_authenticated:
+        data = {}
+        word = request.GET.get('q', '')
+        if word != '':
+            data['query'] = word
+        return JsonResponse(data)
+    
+    return redirect(signin)
+
+    
+
+def querystockproducts(request):
+    
+    if request.user.is_authenticated:
+        data = {}
+        return JsonResponse(data)
+    
+    return redirect(signin)
