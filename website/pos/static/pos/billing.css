@@ -304,4 +304,5 @@ label[for="customer-number"] {
     color: #ffffff;
     font: 0.8rem 'Open Sans', sans-serif;
     font-weight: 600;
+    border-radius: 5px;
 }

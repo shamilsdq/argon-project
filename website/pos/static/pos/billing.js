@@ -79,8 +79,8 @@ var vm = new Vue({
         query: '',
 
         contact: null,
-        total: 0,
-        paid: 0,
+        total: 0.0,
+        paid: 0.0,
 
         products: [],
         suggestions: [],

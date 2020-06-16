@@ -66,13 +66,18 @@
                 </tr>
             </table>
         </div>
-        <div id="newproductform">
-            <span>QUANTITY</span>
-            <input type="number">
-            <span>DISTRIBUTOR</span>
+        <div id="newproductform" v-if="selectedsuggestion != null">
+            <label for="selectedsuggestionquantity">QUANTITY</label>
+            <input type="number" name="selectedsuggestionquantity" id="selectedsuggestionquantity">
+            <label for="distributorselect">DISTRIBUTOR</label>
             <select name="distributorselect" id="distributorselect">
-                <option value="0">DEFAULT</option>
+                <option value="0">null</option>
             </select>
+            <label for="selectedsuggestioncost">COST</label>
+            <input type="number" name="selectedsuggestioncost" id="selectedsuggestioncost">
+            <label for="selectedsuggestionprice">PRICE</label>
+            <input type="number" name="selectedsuggestionprice" id="selectedsuggestionprice">
+            <button>ADD PRODUCT</button>
         </div>
     </aside>
 {% endblock %}

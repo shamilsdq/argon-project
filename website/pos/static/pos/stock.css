@@ -216,3 +216,37 @@ td.cell-stock {
     font-weight: 600;
 }
 
+
+#newproductform {
+    font-size: 0.8rem;
+}
+
+#newproductform label, #newproductform input, #newproductform select {
+    display: inline-block;
+}
+
+#newproductform label {
+    width: 6.5rem;
+}
+
+#newproductform input, #newproductform select {
+    width: 12.5rem;
+    margin-bottom: 0.5rem;
+    padding: 0.4rem 0.6rem;
+    border: 1px solid #bbbbbb;
+    border-radius: 5px;
+}
+
+#newproductform select option {
+    padding: 0.4rem 0.6rem;
+    background: #ddddff;
+}
+
+#newproductform button {
+    display: block;
+    padding: 0.65rem 1rem;
+    margin: 2rem auto 0 auto;
+    background: #fd4545;
+    color: #ffffff;
+    border-radius: 5px;
+}

@@ -1,13 +1,10 @@
-<!DOCTYPE html>
-<html>
+{% extends 'pos/authenticatedbase.html' %}
 
-<head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Reports | Argon</title>
-</head>
+{% load static %}
 
-<body>
-</body>
+{% block htmltitle %}Report | Argon{% endblock %}
 
-</html>
+{% block htmlstatic %}
+    <script src="{% static "pos/libs/vue.js" %}"></script>
+    <link rel="stylesheet" href="{% static "pos/report.css" %}">
+{% endblock %}
