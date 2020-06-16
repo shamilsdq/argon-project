@@ -11,7 +11,7 @@
 
 {% block htmlapp %}
     <section id="form-holder">
-        <input type="text" id="search" placeholder="Product name" autocomplete="off" v-model="query" v-on:keyup.enter="searchQuery()" />
+        <input type="text" id="search" placeholder="Product name" autocomplete="off" v-model="query" v-on:keyup.enter="searchQuery()" v-on:keydown.esc="closesuggestions()"/>
         <ul id="suggestions-holder" v-if="suggestions.length > 0">
             <suggestionrow v-for="suggestedproduct in suggestions" :key="suggestedproduct.id" :row-data="suggestedproduct"></suggestionrow>
         </ul>

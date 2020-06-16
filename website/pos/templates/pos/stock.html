@@ -32,15 +32,48 @@
 
     <aside id="newproduct">
         <h3>New Product</h3>
-        <p>
-            <input type="text" v-model="newproductquery"><button>Search</button>
+        <div>
+            <input type="text" placeholder="search" v-model="newproductquery"  v-on:keyup.enter="queryproduct()" v-on:keydown.esc="closesuggestions()" id="searchnew"/>
             <ul v-if="newproductsuggestions.length > 0">
-                <% newproductsuggestions %>
+                <suggestionrow v-for="newproduct in newproductsuggestions" :key="newproduct.id" :row-data="newproduct"></suggestionrow>
             </ul>
-        </p>
-        <p id="selectiondata" v-if="selectedsuggestion != null">
-            <% selectedsuggestion.id %>
-        </p>
+        </div>
+        <div id="selectiondata" v-if="selectedsuggestion != null">
+            <table>
+                <tr>
+                    <td>ID</td>
+                    <td><% selectedsuggestion.id %></td>
+                </tr>
+                <tr>
+                    <td>NAME</td>
+                    <td><% selectedsuggestion.name %></td>
+                </tr>
+                <tr>
+                    <td>GENERIC NAME</td>
+                    <td><% selectedsuggestion.genericname %></td>
+                </tr>
+                <tr>
+                    <td>COMPANY</td>
+                    <td><% selectedsuggestion.company %></td>
+                </tr>
+                <tr>
+                    <td>MRP</td>
+                    <td><% selectedsuggestion.mrp %></td>
+                </tr>
+                <tr>
+                    <td>TAX</td>
+                    <td><% selectedsuggestion.tax %>% </td>
+                </tr>
+            </table>
+        </div>
+        <div id="newproductform">
+            <span>QUANTITY</span>
+            <input type="number">
+            <span>DISTRIBUTOR</span>
+            <select name="distributorselect" id="distributorselect">
+                <option value="0">DEFAULT</option>
+            </select>
+        </div>
     </aside>
 {% endblock %}
 

@@ -1,3 +1,26 @@
+Vue.component('suggestionrow', {
+
+    props: [
+        'rowData',
+    ],
+
+    delimiters: ['<%', '%>'],
+
+    template: `<li class="suggestion" @click="suggestionselect"><% rowData.name %></li>`,
+
+    methods: {
+        suggestionselect: function() {
+            vm.newproductsuggestions = []
+            this.rowData['qty'] = 1;
+            vm.selectedsuggestion = this.rowData;
+            vm.newproductquery = '';
+        }
+    },
+
+});
+
+
+
 Vue.component('product-row', {
 
     props: [
@@ -38,26 +61,33 @@ var vm = new Vue({
     },
 
     methods: {
+
+        closesuggestions: function() {
+            this.newproductsuggestions = [];
+        },
+
         queryproduct: function() {
             if (this.newproductquery.length < 4) {
                 this.newproductsuggestions = [];
                 return;
             }
 
-            url = '#';
+            url = 'query/newproducts?q=' + this.newproductquery;
             fetch(url)
                 .then(response => {
                     if (!response.ok) throw 'Error';
                     return response.json();
                 })
                 .then(data => {
+                    console.log(data)
                     this.newproductsuggestions = [];
-                    for (i = 0; i < data.products.length; i++) this.newproductsuggestions.push(data.products[i]);
+                    for (i = 0; i < data.result.length; i++) this.newproductsuggestions.push(data.result[i]);
                 })
                 .catch(error => {
                     console.log('error: ', error);
                 })
         },
+
     },
 
     watch: {

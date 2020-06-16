@@ -10,6 +10,7 @@ Vue.component('suggestionrow', {
 
     methods: {
         suggestionselect: function() {
+            this.rowData['qty'] = 1;
             vm.addProduct(this.rowData);
         }
     },
@@ -96,6 +97,10 @@ var vm = new Vue({
 
     methods: {
 
+        closesuggestions: function() {
+            this.suggestions = [];
+        },
+
         // send request to backend asynchronously if query text has 4 or more chars
         searchQuery() {
             if (this.query.length < 4) {
@@ -104,15 +109,16 @@ var vm = new Vue({
             }
 
             // URL to be replaced (Currently a sample json data file)
-            url = "../data.json";
+            url = "query/stockproducts?q=" + this.query;
             fetch(url)
                 .then(response => {
                     if (!response.ok) throw 'Error';
                     return response.json();
                 })
                 .then(data => {
+                    console.log(data);
                     this.suggestions = [];
-                    for (i = 0; i < data.products.length; i++) this.suggestions.push(data.products[i]);
+                    for (i = 0; i < data.result.length; i++) this.suggestions.push(data.result[i]);
                 })
                 .catch(error => {
                     console.log('error: ', error);

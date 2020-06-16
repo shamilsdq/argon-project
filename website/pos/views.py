@@ -135,8 +135,25 @@ def querynewproducts(request):
     if request.user.is_authenticated:
         data = {}
         word = request.GET.get('q', '')
+
         if word != '':
             data['query'] = word
+            nameset = Products.objects.filter(name__startswith = word)
+            companyset = Products.objects.filter(company__startswith = word)
+            genericset = Products.objects.filter(genericname__startswith = word)
+            productset = nameset | companyset | genericset
+            result = []
+
+            for product in productset:
+                x = {'id': product.id, 'name': product.name, 'company': product.company, 'genericname': product.genericname, 'mrp': product.mrp, 'tax': product.tax}
+                result.append(x)
+
+            data['result'] = result 
+
+        else:
+            data['query'] = None
+            data['result'] = None
+
         return JsonResponse(data)
     
     return redirect(signin)
@@ -147,6 +164,24 @@ def querystockproducts(request):
     
     if request.user.is_authenticated:
         data = {}
+        word = request.GET.get('q', '')
+
+        if word != '':
+            data['query'] = word
+            productset = Stocks.objects.filter(user = request.user).filter(product__name__startswith = word)
+            result = []
+
+            for product in productset:
+                if product.stock <= 0: continue
+                x = {'id': product.product_id, 'name': product.product.name, 'mrp': product.product.mrp, 'price': product.price}
+                result.append(x)
+            
+            data['result'] = result
+            
+        else:
+            data['query'] = None
+            data['result'] = None
+            
         return JsonResponse(data)
     
     return redirect(signin)
