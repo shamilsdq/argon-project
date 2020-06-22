@@ -24,7 +24,8 @@ dependencies:
   flutter:
     sdk: flutter
   location: ^2.4.0
-  google_maps_flutter: ^0.5.24
+  google_maps_flutter: ^0.5.28+1
+  url_launcher: ^5.4.10
   flutter_spinkit: ^4.1.1
 
 
@@ -48,9 +49,10 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
+  assets:
+    - assets/myicon.png
+    - assets/markericon.png
+    - assets/mapstyle.json
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

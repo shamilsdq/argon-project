@@ -25,7 +25,7 @@ class Argon extends StatelessWidget {
           ),
         ),
         buttonTheme: ButtonThemeData(
-          buttonColor: Color(0xff273952),
+          buttonColor: Color(0xfffd4545),
           padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 35.0),
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(25.0)

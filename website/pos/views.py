@@ -1,17 +1,18 @@
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
+
+from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib import messages
-from django.contrib.auth.models import User
-from pos.models import Users
-from .models import Users, Products, Distributors, Stocks
 from pos.forms import SignUpForm
 
+from django.db import transaction
+from .models import Users, Products, Stocks, Bills, BillItems
+import json
 
-# ------------
-# normal views
-# ------------
+# --------------------
+# normal views section
+# --------------------
 
 def signup(request):
 
@@ -63,8 +64,6 @@ def signin(request):
             if user is not None:
                 login(request, user)
                 return redirect(billing)
-        
-        messages.error(request, 'Invalid credentials')
     
     else:
         form = AuthenticationForm()
@@ -89,8 +88,7 @@ def billing(request):
         context = {}
         return render(request, 'pos/billing.html', context)
 
-    else:
-        return redirect(signin)
+    return redirect(signin)
 
 
 
@@ -108,27 +106,33 @@ def stock(request):
         context = {'productlist': productlist}
         return render(request, 'pos/stock.html', context)
 
-    else:
-        return redirect(signin)
+    return redirect(signin)
 
 
 
 def report(request):
 
-    Products.objects.create(company="inglecorp", name="Sulphuric acid", genericname="hydrogen sulphide", mrp=80, tax=8)
-    context = {}
-    return render(request, 'pos/report.html', context)
+    if request.user.is_authenticated:
+        context = {}
+        return render(request, 'pos/report.html', context)
+
+    return redirect(signin)
 
 
 
-def profile(request):
-    pass
+#def profile(request):
+#
+#    if request.user.is_authenticated:
+#        context = {}
+#        return render(request, 'pos/profile.html', context)
+#
+#    return redirect(signin)
 
 
 
-# --------------
-# json responses
-# --------------
+# -------------------
+# async calls section
+# -------------------
 
 def querynewproducts(request):
 
@@ -183,5 +187,38 @@ def querystockproducts(request):
             data['result'] = None
             
         return JsonResponse(data)
+    
+    return redirect(signin)
+
+
+
+def savebill(request):
+
+    if request.user.is_authenticated:
+        result = {'status': 'Processing'}
+
+        try:
+            with transaction.atomic():
+                billdata = json.loads(request.body.decode('utf-8')) 
+                bill = Bills.objects.create(
+                    user = request.user,
+                    customernumber = billdata['customernumber'],
+                    amount = billdata['amount'],
+                    ispaid = True
+                )
+
+                for item in billdata['billitems']:
+                    BillItems.objects.create(
+                        bill = bill,
+                        product = item['id'],
+                        quantity = item['quantity']
+                    )   
+
+                result['status'] = 'Success'
+
+        except:
+            result['status'] = 'Failure'
+            
+        return JsonResponse(result)
     
     return redirect(signin)

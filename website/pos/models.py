@@ -1,7 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 
 
 
@@ -50,7 +48,7 @@ class Distributors(models.Model):
 
 class Stocks(models.Model):
 
-    user = models.ForeignKey(User, on_delete = models.CASCADE)
+    user = models.ForeignKey(Users, on_delete = models.CASCADE, related_name='userstock')
     product = models.ForeignKey(Products, on_delete = models.CASCADE)
     distributor = models.ForeignKey(Distributors, on_delete = models.CASCADE)
     cost = models.FloatField()
@@ -65,7 +63,7 @@ class Stocks(models.Model):
 class Bills(models.Model):
 
     id = models.AutoField(primary_key = True)
-    user = models.ForeignKey(User, on_delete = models.CASCADE)
+    user = models.ForeignKey(Users, on_delete = models.CASCADE)
     time = models.DateTimeField(auto_now = True)
     customernumber = models.IntegerField()
     amount = models.FloatField()

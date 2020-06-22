@@ -20,6 +20,8 @@ body {
 
 header {
     display: block;
+    width: 100%;
+    min-width: 1250px;
     background: #28cc9e;
     padding: 10px 20px;
 }

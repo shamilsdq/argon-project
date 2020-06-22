@@ -4,5 +4,6 @@ from . import views
 
 
 urlpatterns = [
-    path('', views.apicall, name='api')
+    path('suggest', views.suggest, name='suggest'),
+    path('', views.apicall, name='apicall'),
 ]
