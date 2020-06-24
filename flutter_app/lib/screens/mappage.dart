@@ -1,17 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutterapp/services/maputils.dart';
+
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
+
 import 'dart:typed_data';
 import 'dart:ui' as ui;
-import 'package:flutter/services.dart';
 import 'dart:async';
+
 import 'package:flutterapp/widgets/loading.dart';
+import 'package:flutterapp/models/shop.dart';
+import 'package:flutterapp/models/product.dart';
+import 'package:flutterapp/models/result.dart';
+import 'package:flutterapp/services/api.dart';
 
 
 
 class MapPage extends StatefulWidget {
-  final String searchtext;
-  MapPage({ this.searchtext });
+  final Product product;
+  MapPage({ this.product });
 
   @override
   _MapPageState createState() => _MapPageState();
@@ -22,15 +30,16 @@ class MapPage extends StatefulWidget {
 class _MapPageState extends State<MapPage> {
 
   Completer<GoogleMapController> _mapcontroller = Completer();
+  GoogleMapController _controller;
   Location _location = new Location();
   LocationData _startLocation, _currentLocation;
   StreamSubscription<LocationData> _locationSubscription;
 
-  Marker myMarker = Marker(
-    markerId: MarkerId('me'),
-    position: LatLng(0, 0)
-  );
+  Marker myMarker = Marker(markerId: MarkerId('me'), position: LatLng(0, 0));
   Set<Marker> markers = Set();
+  Set<Circle> circles = Set();
+  double mapZoom = 15.0;
+
 
   @override
   void initState() {
@@ -38,17 +47,16 @@ class _MapPageState extends State<MapPage> {
     initPlatformState();
   }
 
+
   @override
   void dispose() {
     if(_locationSubscription != null) _locationSubscription.cancel();
     super.dispose();
   }
 
+
   @override
   Widget build(BuildContext context) {
-    markers.addAll([
-      myMarker
-    ]);
     return _startLocation == null ?
     Loading() : Scaffold(
       body: Stack(
@@ -57,12 +65,14 @@ class _MapPageState extends State<MapPage> {
             onMapCreated: (GoogleMapController controller){
               _setStyle(controller);
               _mapcontroller.complete(controller);
+              _controller = controller;
             },
             initialCameraPosition: CameraPosition(
               target: LatLng(_currentLocation.latitude, _currentLocation.longitude),
-              zoom: 15.0,
+              zoom: mapZoom,
             ),
             markers: markers,
+            circles: circles,
           ),
         ],
       ),
@@ -72,32 +82,46 @@ class _MapPageState extends State<MapPage> {
 
   /* if permitted get startlocation and the subscribe to listen to location changes */
   initPlatformState() async {
+
     final Uint8List myMarkerIcon = await getBytesFromAsset('assets/myicon.png', 40);
     final Uint8List shopMarkerIcon = await getBytesFromAsset('assets/markericon.png', 60);
 
     LocationData location;
     if(await _location.hasPermission() == PermissionStatus.GRANTED) {
-      location = await _location.getLocation();
-      _locationSubscription = _location.onLocationChanged().listen((LocationData result) {
-            setState(() => _currentLocation = result);
-            markers.remove(myMarker);
-            myMarker = Marker(
-              markerId: MarkerId('ME'),
-              position: LatLng(_currentLocation.latitude, _currentLocation.longitude),
-              icon: BitmapDescriptor.fromBytes(myMarkerIcon),
-            );
-      });
-      markers.addAll([
+
+      _locationSubscription = _location.onLocationChanged()
+          .listen((LocationData result) {
+
+              _currentLocation = result;
+
+              setState(() {
+                markers.remove(myMarker);
+                myMarker = Marker(
+                  markerId: MarkerId('ME'),
+                  position: LatLng(_currentLocation.latitude, _currentLocation.longitude),
+                  icon: BitmapDescriptor.fromBytes(myMarkerIcon),
+                );
+                markers.add(myMarker);
+              });
+
+              if(_startLocation == null) {
+                _startLocation = _currentLocation;
+                updateShops(shopMarkerIcon);
+              }
+
+          });
+
+      /*markers.addAll([
         Marker(
           markerId: MarkerId('cucek'),
           position: LatLng(9.460568, 76.438183),
           icon: BitmapDescriptor.fromBytes(shopMarkerIcon),
           anchor: Offset(0.0, 0.75),
           infoWindow: InfoWindow(
-            title: 'cucek medicals',
-            onTap: () {
-              Navigator.pop(context);
-            }
+              title: 'cucek medicals',
+              onTap: () {
+                Navigator.pop(context);
+              }
           ),
         ),
         Marker(
@@ -118,16 +142,64 @@ class _MapPageState extends State<MapPage> {
           icon: BitmapDescriptor.fromBytes(shopMarkerIcon),
           onTap: () {},
         ),
-      ]);
+      ]);*/
+
     } else {
+
       PermissionStatus _permission = await _location.requestPermission();
       if(_permission != PermissionStatus.GRANTED) Navigator.pop(context);
+
     }
-    setState(() => _startLocation = location);
+
   }
 
-  getData() {
+  void updateShops(Uint8List shopMarkerIcon) async {
+    print('calling api');
+    APIResult result = await APIService().locateshops(widget.product.id, _startLocation);
+    if(result == null) {
+      print('api returned null');
+      return;
+    }
+    if(result.errors != null) {
+      print('error in API call');
+      return;
+    }
+    mapZoom = result.zoom;
 
+    if(_controller != null){
+      _controller.animateCamera(CameraUpdate.newLatLngZoom(
+        LatLng(_currentLocation.latitude, _currentLocation.longitude),
+        mapZoom,
+      ));
+    }
+
+    for(Shop shopx in result.shops){
+      print(shopx.name);
+      bool flag = false;
+      for(Marker markerx in markers) {
+        if(markerx.markerId == shopx.id.toString()) {
+          flag = true;
+          break;
+        }
+      }
+      if(flag == false) {
+        Marker m = new Marker(
+          markerId: MarkerId(shopx.id.toString()),
+          position: shopx.location,
+          icon: BitmapDescriptor.fromBytes(shopMarkerIcon),
+          infoWindow: InfoWindow(
+              title: shopx.name,
+              snippet: shopx.address,
+              onTap: () {
+                MapUtils.openMap(shopx.location.latitude, shopx.location.longitude);
+              }
+          ),
+        );
+        setState(() {
+          markers.add(m);
+        });
+      }
+    }
   }
 
 

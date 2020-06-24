@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:flutterapp/models/product.dart';
+
 import 'package:flutterapp/screens/mappage.dart';
+import 'package:flutterapp/services/api.dart';
 
 
 class Home extends StatefulWidget {
@@ -10,6 +14,8 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   GlobalKey<FormState> _searchform = GlobalKey<FormState>();
   String _searchtext = '';
+  Product selectedProduct;
+  TextEditingController _controller = new TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -26,33 +32,58 @@ class _HomeState extends State<Home> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                TextFormField(
+                TypeAheadField(
+
+                  textFieldConfiguration: TextFieldConfiguration(
+                    controller: _controller,
                     decoration: InputDecoration(
-                      hintText: 'Medicine Name',
+                      hintText: 'Search medicine',
                     ),
-                    onChanged: (val) => _searchtext = val,
-                    validator: (val) {
-                      if(val.isEmpty) return 'Empty';
-                      return null;
-                    }
+                  ),
+
+                  suggestionsCallback: (pattern) async {
+                    if(pattern.length == 0) return null;
+                    return await APIService().suggestions(pattern);
+                  },
+
+                  suggestionsBoxDecoration: SuggestionsBoxDecoration(
+                    color: Color(0xcc29cc9f),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+
+                  itemBuilder: (context, product) {
+                    return ListTile(
+                      title: Text(product.name),
+                    );
+                  },
+
+                  onSuggestionSelected: (product) {
+                    selectedProduct = product;
+                    this._controller.text = product.name;
+                  },
+                  hideOnLoading: true,
                 ),
                 SizedBox(height: 20.0),
-                RaisedButton(
-                  child: Text('Find availability'),
-                  elevation: 5.0,
-                  onPressed: () {
-                    if(_searchform.currentState.validate()) {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => MapPage(searchtext: _searchtext))
-                      );
-                    }
-                    else {
-                      Scaffold.of(context)
-                          .showSnackBar(SnackBar(content: Text('Empty search string')));
-                    }
+                Builder(
+                  builder: (BuildContext context) {
+                    return RaisedButton(
+                      child: Text('Find availability'),
+                      elevation: 5.0,
+                      onPressed: () {
+                        if(selectedProduct != null) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => MapPage(product: selectedProduct)),
+                          );
+                        }
+                        else {
+                          Scaffold.of(context)
+                              .showSnackBar(SnackBar(content: Text('No such product')));
+                        }
+                      },
+                    );
                   },
-                ),
+                )
               ],
             ),
           ),

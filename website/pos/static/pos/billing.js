@@ -10,7 +10,6 @@ Vue.component('suggestionrow', {
 
     methods: {
         suggestionselect: function() {
-            this.rowData['qty'] = 1;
             vm.addProduct(this.rowData);
         }
     },
@@ -42,6 +41,7 @@ Vue.component('productrow', {
     methods: {
 
         qtydown: function() {
+            console.log(this.rowData.qty);
             if (this.rowData.qty == 1) return
             this.rowData.qty--;
             vm.total -= this.rowData.price;
@@ -128,6 +128,7 @@ var vm = new Vue({
 
         // FORMAT -- addProduct({ id: 007, name: 'James Bond', mrp: 100, price: 75, qty: 1 }) 
         addProduct: function(newProduct) {
+            console.log(newProduct);
             if (newProduct.qty == 0) return
             for (var i = 0; i < this.products.length; i++) {
                 if (this.products[i].id == newProduct.id) {
@@ -145,11 +146,40 @@ var vm = new Vue({
         // to be completed as per backend requirement.
         // submit the form after the below actions.
         completeBill: function() {
-            let billForm = new FormData();
-            billForm.append('contact', this.contact);
-            billForm.append('amount', this.total);
-            billForm.append('isPaid', true);
-            billForm.append('items', products);
+            var billForm = {}
+            billForm['contact'] = this.contact;
+            billForm['amount'] = this.total;
+            billForm['isPaid'] = true;
+            billForm['items'] = this.products;
+            console.log(billForm);
+
+            fetch('savebill', {
+                'method': 'POST',
+                'body': JSON.stringify(billForm),
+            })
+            .then(response => {
+                if(!response.ok) throw 'error';
+                return response.json();
+            })
+            .then(data => {
+                console.log(data['process']);
+                if(data['process'] == 'Failure') {
+                    alert('Failed to save bill (value error)');
+                } else {
+                    alert('Successfully saved bill');
+                    this.suggestions = [];
+                    this.products = [];
+                    this.contact = null;
+                    this.total = 0;
+                    this.paid = 0;
+                    this.query = '';
+                }
+            })
+            .catch(error => {
+                console.log('Error: ', error);
+                alert('Cannot save bill data (Connection error)')
+            })
+
         }
 
     },

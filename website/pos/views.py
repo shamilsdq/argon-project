@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
@@ -7,7 +7,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from pos.forms import SignUpForm
 
 from django.db import transaction
-from .models import Users, Products, Stocks, Bills, BillItems
+from .models import *
 import json
 
 # --------------------
@@ -95,15 +95,24 @@ def billing(request):
 def stock(request):
 
     if request.user.is_authenticated:
-        dbresult = Stocks.objects.filter(user__id=1).order_by('product_id')
+
         productlist = []
+        dbresult = Stocks.objects.filter(user__id = request.user.id).order_by('product_id')
 
         for row in dbresult:
             ## passing a non-empty string to visible property will give true in js
             details = {'id': row.product_id, 'name': row.product.name, 'distributor': row.distributor.name, 'stock': row.stock, 'visible': '1'}
             productlist.append(details)
 
-        context = {'productlist': productlist}
+        distributorlist = []
+        dbresult = Distributors.objects.raw('SELECT * FROM pos_distributors WHERE id IN (SELECT distributor_id FROM pos_stocks WHERE user_id = %s)', [request.user.id])
+
+        for row in dbresult:
+            details = {'id': row.id, 'name': row.name}
+            print(row.name)
+            distributorlist.append(details)
+
+        context = {'productlist': productlist, 'distributorlist': distributorlist}
         return render(request, 'pos/stock.html', context)
 
     return redirect(signin)
@@ -172,12 +181,12 @@ def querystockproducts(request):
 
         if word != '':
             data['query'] = word
-            productset = Stocks.objects.filter(user = request.user).filter(product__name__startswith = word)
+            productset = Stocks.objects.filter(user = request.user.id).filter(product__name__startswith = word)
             result = []
 
             for product in productset:
                 if product.stock <= 0: continue
-                x = {'id': product.product_id, 'name': product.product.name, 'mrp': product.product.mrp, 'price': product.price}
+                x = {'id': product.product_id, 'name': product.product.name, 'mrp': product.product.mrp, 'price': product.price, 'qty': 1}
                 result.append(x)
             
             data['result'] = result
@@ -195,30 +204,77 @@ def querystockproducts(request):
 def savebill(request):
 
     if request.user.is_authenticated:
-        result = {'status': 'Processing'}
+        result = {}
+        billform = json.loads(request.body)
+        if int(billform['contact']) > 9999999999 or billform['items'] == [] or float(billform['amount']) <= 0:
+            raise ValueError
 
         try:
             with transaction.atomic():
-                billdata = json.loads(request.body.decode('utf-8')) 
+            
+                print('checkpoint 1')
                 bill = Bills.objects.create(
-                    user = request.user,
-                    customernumber = billdata['customernumber'],
-                    amount = billdata['amount'],
+                    user = Users.objects.get(id = request.user.id),
+                    customernumber = int(billform['contact']),
+                    amount = float(billform['amount']),
                     ispaid = True
                 )
-
-                for item in billdata['billitems']:
+                print('checkpoint 2')
+                for item in billform['items']:
                     BillItems.objects.create(
                         bill = bill,
-                        product = item['id'],
-                        quantity = item['quantity']
-                    )   
+                        product = Products.objects.get(id = item['id']),
+                        quantity = item['qty'],
+                    )
+                print('checkpoint 3')
 
-                result['status'] = 'Success'
+            result = {'process': 'Success'}
+        
+        except:
+            result = {'process': 'Failure'}
+            
+        return JsonResponse(result)
+    
+    return redirect(signin)
+
+
+
+def addstock(request):
+    
+    if request.user.is_authenticated:
+        result = {}
+        form = json.loads(request.body)
+        print(form)
+
+        try:
+            stock = Stocks.objects.filter(user_id = request.user.id).filter(product_id = int(form['productid']))
+            
+            # if it is a new product
+            if not stock:
+                Stocks.objects.create(
+                    user = Users.objects.get(id = request.user.id),
+                    product = Products.objects.get(id = int(form['productid'])),
+                    distributor = Distributors.objects.get(id = int(form['distributorid'])),
+                    cost = float(form['cost']),
+                    price = float(form['price']),
+                    stock = int(form['stock']),
+                )
+                result['process'] = 'New stock created'
+
+            # else update old stock
+            else:
+                for x in stock:
+                    x.stock += int(form['stock'])
+                    x.cost = float(form['cost'])
+                    x.price = float(form['price'])
+                    x.save()
+                    break
+                result['process'] = 'Stock updated'
 
         except:
-            result['status'] = 'Failure'
-            
+            result['process'] = 'Failure'
+
+
         return JsonResponse(result)
     
     return redirect(signin)

@@ -68,16 +68,17 @@
         </div>
         <div id="newproductform" v-if="selectedsuggestion != null">
             <label for="selectedsuggestionquantity">QUANTITY</label>
-            <input type="number" name="selectedsuggestionquantity" id="selectedsuggestionquantity">
+            <input type="number" name="selectedsuggestionquantity" id="selectedsuggestionquantity" v-model="selectedquantity">
             <label for="distributorselect">DISTRIBUTOR</label>
-            <select name="distributorselect" id="distributorselect">
-                <option value="0">null</option>
+            <select name="distributorselect" id="distributorselect" v-model="selecteddistributor"> 
+                <option value="0" selected disabled>NULL</option>
+                <option v-for="distributor in distributors" :value="distributor.id"><% distributor.name %></option>
             </select>
             <label for="selectedsuggestioncost">COST</label>
-            <input type="number" name="selectedsuggestioncost" id="selectedsuggestioncost">
+            <input type="number" name="selectedsuggestioncost" id="selectedsuggestioncost" v-model="selectedcost">
             <label for="selectedsuggestionprice">PRICE</label>
-            <input type="number" name="selectedsuggestionprice" id="selectedsuggestionprice">
-            <button>ADD PRODUCT</button>
+            <input type="number" name="selectedsuggestionprice" id="selectedsuggestionprice" v-model="selectedprice">
+            <button @click="addstock">ADD PRODUCT</button>
         </div>
     </aside>
 {% endblock %}
@@ -86,5 +87,7 @@
     <script src="{% static "pos/stock.js" %}"></script>
     <script>
         vm.products = {{ productlist|safe }};
+        vm.distributors = {{ distributorlist|safe }};
+        console.log(vm.distributors);
     </script>
 {% endblock %}
