@@ -7,6 +7,7 @@ import 'package:flutterapp/models/shop.dart';
 import 'package:flutterapp/models/result.dart';
 
 
+
 class APIService {
 
   final String baseurl = 'http://192.168.1.101:8000/api/';

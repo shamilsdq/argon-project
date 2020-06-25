@@ -13,7 +13,6 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   GlobalKey<FormState> _searchform = GlobalKey<FormState>();
-  String _searchtext = '';
   Product selectedProduct;
   TextEditingController _controller = new TextEditingController();
 

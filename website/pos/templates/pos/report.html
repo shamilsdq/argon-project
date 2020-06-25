@@ -8,3 +8,55 @@
     <script src="{% static "pos/libs/vue.js" %}"></script>
     <link rel="stylesheet" href="{% static "pos/report.css" %}">
 {% endblock %}
+
+{% block htmlapp %}
+    <aside>
+        <article class="reportbox">
+            <h3>TODAY</h3>
+            <span>SALE</span><span>{{ today.sale }}</span>
+            <span>BILLS</span><span>{{ today.bills }}</span>
+        </article>
+        <article class="reportbox">
+            <h3>THIS WEEK</h3>
+            <span>SALE</span><span>{{ week.sale }}</span>
+            <span>BILLS</span><span>{{ week.bills }}</span>
+        </article>
+    </aside>
+
+    <section id="bills">
+        <div id="billsearch">
+            <input type="text" placeholder="Bill ID or customer number" v-model="searchtext">
+        </div>
+        <div id="billstable">
+            <table>
+                <tr>
+                    <th class="cell-id">ID</th>
+                    <th class="cell-contact">CONTACT</th>
+                    <th class="cell-amount">AMOUNT</th>
+                </tr>
+                <tr is="billrow" v-for="bill in bills" v-if="bill.visible" :key="bill.id" :billdata="bill"></tr>
+            </table>
+        </div>
+    </section>
+
+    <section id="selectedbill">
+        <h3>SELECTED BILL</h3>
+        
+        <div id="billdetails" v-if="billdetails != null">
+            <span id="id_selectedbill">BILL ID: <% billdetails.id %></span>
+            <span id="contact_selectedbill">CONTACT: <% billdetails.contact %></span>
+            <template v-for="item in billdetails.items">
+                <span class="name_item_selectedbill"><% item.name %></span>
+                <span class="quantity_item_selectedbill"><% item.quantity %></span>
+            </template>
+            <span id="amount_selectedbill">TOTAL: Rs.<% billdetails.amount %></span>
+        </div>
+    </section>
+{% endblock %}
+
+{% block htmljs %}
+    <script src="{% static "pos/report.js" %}"></script>
+    <script>
+        vm.bills = {{ bills|safe }}
+    </script>
+{% endblock %}

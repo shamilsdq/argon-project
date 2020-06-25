@@ -20,5 +20,6 @@ urlpatterns = [
 
     path('query/newproducts', views.querynewproducts, name='newproductsquery'),
     path('query/stockproducts', views.querystockproducts, name='stockproductsquery'),
+    path('query/billdetails', views.billdetails, name='billdetailsquery'),
 
 ]

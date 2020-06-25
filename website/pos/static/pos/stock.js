@@ -145,7 +145,7 @@ var vm = new Vue({
     watch: {
         searchtext: function() {
             for (i = 0; i < this.products.length; i++) {
-                if (this.products[i].name.toLowerCase().search(this.searchtext.toLowerCase()) == -1 && this.products[i].distributor.toLowerCase().search(this.searchtext.toLowerCase())) {
+                if (this.products[i].name.toLowerCase().search(this.searchtext.toLowerCase()) == -1 && this.products[i].distributor.toLowerCase().search(this.searchtext.toLowerCase()) == -1) {
                     this.products[i].visible = false
                 } else {
                     this.products[i].visible = true

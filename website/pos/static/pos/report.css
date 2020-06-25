@@ -58,3 +58,174 @@ header .container > a {
     font-weight: 700;
     color: #ffffff;
 }
+
+
+
+
+
+#app {
+    display: block;
+    width: 1250px;
+    margin: auto;
+    margin-top: 2.5rem;
+    overflow: hidden;
+}
+
+#app aside {
+    display: block;
+    float: left;
+    width: 14rem;
+}
+
+.reportbox {
+    display: block;
+    background: #28cc9e;
+    padding: 40px;
+    margin-bottom: 0.25rem;
+    border-radius: 5px;
+}
+
+.reportbox h3 {
+    display: block;
+    font: 1.75rem 'Open Sans', sans-serif;
+    font-weight: 100;
+    color: #ffffff;
+    margin-bottom: 0.75rem;
+}
+
+.reportbox span {
+    display: inline-block;
+    width: 5rem;
+    font: 1.1rem 'Open Sans', sans-serif;
+    font-weight: 700;
+    color: rgba(0, 0, 0, 0.5);
+    margin-top: 1rem;
+}
+
+.reportbox span:nth-child(2n+1) {
+    text-align: right;
+}
+
+
+
+
+
+#bills {
+    display: block;
+    float: left;
+    width: 28rem;
+    height: calc(100vh - 9rem);
+    margin-left: 5px;
+}
+
+#billsearch {
+    display: block;
+    padding: 1.5rem 2rem;
+    background: #28cc9e;
+}
+
+#billsearch > input {
+    width: 315px;
+    padding: 6px 10px;
+    background: #ffffff;
+    border: 2px solid #aaaaaa;
+    box-shadow: 0px 0px 5px 0px rgba(100, 100, 100, 0.2);
+    border-radius: 5px;
+    font: 0.8rem 'Open Sans', sans-serif;
+}
+
+#billstable {
+    display: block;
+    background: #000;
+    height: calc(100vh - 12rem);
+    background: #d8fcfc;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+th {
+    width: 120px;
+    padding: 5px;
+    background: #28cc9e;
+    border: 1px solid #08ac7e;
+    font: 0.7rem 'Open Sans', sans-serif;
+    font-weight: 700;
+}
+
+td {
+    background: #d4f3ef;
+    padding: 3px 8px;
+    border: 1px solid #08ac7e;
+    font-size: 0.75rem;
+    text-align: left;
+    cursor: pointer;
+}
+
+.cell-id, .cell-amount {
+    width: 140px;
+}
+td.cell-amount {
+    text-align: right;
+}
+th.cell-amount {
+    text-align: center;
+}
+.cell-contact {
+    width: 280px;
+    text-align: center;
+}
+
+
+
+
+#selectedbill {
+    display: inline-block;
+    width: 20rem;
+    height: calc(100vh - 9rem);
+    margin-left: 5px;
+    background: #eeeeee;
+    border: 1px solid #d5d5d5;
+    border-radius: 5px;
+}
+#selectedbill h3 {
+    display: block;
+    padding: 1.5rem;
+    text-align: center;
+}
+
+
+#billdetails {
+    display: block;
+    padding: 2rem 2.75rem;
+    height: calc(100vh - 14rem);
+    overflow-y: auto;
+}
+#billdetails span {
+    font: 0.75rem Monospace, serif;
+}
+
+#id_selectedbill {
+    display: block;
+    margin-bottom: 0.5rem;
+}
+#contact_selectedbill {
+    display: block;
+    margin-bottom: 1.75rem;
+}
+#amount_selectedbill {
+    display: block;
+    margin-top: 1.75rem;
+}
+
+.name_item_selectedbill {
+    display: inline-block;
+    width: 230px;
+}
+.quantity_item_selectedbill {
+    display: inline-block;
+    width: 50px;
+    text-align: right;
+}
+

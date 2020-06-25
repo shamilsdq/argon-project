@@ -9,6 +9,9 @@ from pos.forms import SignUpForm
 from django.db import transaction
 from .models import *
 import json
+import datetime
+
+
 
 # --------------------
 # normal views section
@@ -123,6 +126,30 @@ def report(request):
 
     if request.user.is_authenticated:
         context = {}
+
+        report_week = {'sale': 0, 'bills': 0}
+        bills = Bills.objects.raw('SELECT * FROM pos_bills WHERE user_id = %s AND time > %s', [request.user.id, datetime.datetime.now() - datetime.timedelta(days=7)])
+        for x in bills:
+            report_week['sale'] += x.amount
+            report_week['bills'] += 1
+
+        report_today = {'sale': 0, 'bills': 0}
+        bills = Bills.objects.raw('SELECT * FROM pos_bills WHERE user_id = %s AND CAST(time AS DATE) = %s', [request.user.id, datetime.date.today()])
+        for x in bills:
+            report_today['sale'] += x.amount
+            report_today['bills'] += 1
+
+        all_bills = []
+        dbresult = Bills.objects.filter(user_id = request.user.id)
+        for row in dbresult:
+            x = {'id': row.id, 'contact': row.customernumber, 'amount': row.amount, 'visible': '1'}
+            print(x)
+            all_bills.append(x)
+
+        context['week'] = report_week
+        context['today'] = report_today
+        context['bills'] = all_bills
+
         return render(request, 'pos/report.html', context)
 
     return redirect(signin)
@@ -195,6 +222,33 @@ def querystockproducts(request):
             data['query'] = None
             data['result'] = None
             
+        return JsonResponse(data)
+    
+    return redirect(signin)
+
+
+
+def billdetails(request):
+    
+    if request.user.is_authenticated:
+        data = {}
+        word = request.GET.get('q', 0)
+
+        if word != 0:
+            word = int(word)
+            data['query'] = word
+            billitems = BillItems.objects.filter(bill_id = word)
+            result = []
+
+            for item in billitems:
+                x = {'product': item.product.name, 'quantity': item.quantity}
+                result.append(x)
+
+            data['result'] = result
+
+        else:
+            data['query'] = data['result'] = None
+
         return JsonResponse(data)
     
     return redirect(signin)
